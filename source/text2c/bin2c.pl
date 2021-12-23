@@ -9,7 +9,7 @@ sub convertStream {
             printf("0x%x,", ord($bytes[$i]));
         }
     }
-    print "0};\n";
+    print "0x0};\n";
 }
 
 convertStream();
