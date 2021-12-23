@@ -8,8 +8,8 @@ sub convertStream {
         for(my $i = 0; $i < scalar @bytes; $i++) {
             printf("0x%x, ", ord($bytes[$i]));
         }
-        print "0};\n";
     }
+    print "0};\n";
 }
 
 convertStream();
