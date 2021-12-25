@@ -26,7 +26,7 @@ print "<form action=\"text2c.cgi\" method=\"GET\">\n";
 print "<textarea rows=\"40\" cols=\"80\" id=\"txt\" name=\"txt\">$input</textarea>\n";
 print "<input type=SUBMIT>\n";
 print "</form>\n";
-print "</body></html>\n";
+
 
 
 sub convertStream {
@@ -45,4 +45,4 @@ sub convertStream {
     print "<br>0x0};\n";
 }
 convertStream($input);
-
+print "</body></html>\n";
