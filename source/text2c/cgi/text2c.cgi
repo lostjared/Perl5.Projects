@@ -1,13 +1,7 @@
 #!/usr/bin/perl
 
 print "Content-type: text/html\n\n";
-print "Convert Text to C array\n";
-print "<html><head><title>Text to C</title></head><body>\n";
-print "<form action=\"text2c.cgi\" method=\"GET\">\n";
-print "<textarea rows=\"40\" cols=\"80\" id=\"txt\" name=\"txt\"></textarea>\n";
-print "<input type=SUBMIT>\n";
-print "</form>\n";
-print "</body></html>\n";
+
 
 local ($buffer, @pairs, $pair, $name, $value, %FORM);
 $ENV{'REQUEST_METHOD'} =~ tr/a-z/A-Z/;
@@ -25,6 +19,15 @@ foreach $pair (@pairs) {
 }
 
 my $input = $FORM{txt};
+
+print "Convert Text to C array\n";
+print "<html><head><title>Text to C</title></head><body>\n";
+print "<form action=\"text2c.cgi\" method=\"GET\">\n";
+print "<textarea rows=\"40\" cols=\"80\" id=\"txt\" name=\"txt\">$input</textarea>\n";
+print "<input type=SUBMIT>\n";
+print "</form>\n";
+print "</body></html>\n";
+
 
 sub convertStream {
     my $buffer = $_[0];
