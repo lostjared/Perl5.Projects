@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 print "Content-type: text/html\n\n";
 
@@ -19,19 +19,47 @@ foreach $pair (@pairs) {
 }
 
 my $input = $FORM{txt};
+my $mode_str = $FORM{mode};
 
-print "Convert Text to C array\n";
+print "Convert Text to C \n";
 print "<html><head><title>Text to C</title></head><body>\n";
 print "<form action=\"text2c.cgi\" method=\"GET\">\n";
+print "Mode:<br> <select id=\"mode\" name=\"mode\">\n";
+print "<option value=\"string\">string</option>\n";
+print "<option value=\"array\">array</option>\n";
+print "</select><br>\n";
 print "<textarea rows=\"40\" cols=\"80\" id=\"txt\" name=\"txt\">$input</textarea>\n";
 print "<input type=SUBMIT>\n";
 print "</form>\n";
 
+sub fix_string {
+    my $input = $_[0];
+    my @bytes = split("", $input);
+    my $output = "";
+    for(my $i = 0; $i < scalar @bytes; $i++) {
+        if ($bytes[$i] eq "\\") {
+            $output .= "\\\\";
+        }
+        elsif($bytes[$i] eq "\"") {
+            $output .= "\\";
+            $output .= "\"";
+        }
+        else {
+            $output .= $bytes[$i];
+        }
+    }
+    $output;
+}
 
+sub convertString {
+    print "const char *data = \"";
+    print  fix_string($_[0]) . "\\n";
+    print "\";\n";
+}
 
 sub convertStream {
     my $buffer = $_[0];
-    print "unsigned char bytes[] = {\n<br>";
+    print "unsigned char bytes[] = {\n";
     my @bytes = split("", $buffer);
     my $index = 0;
     for(my $i = 0; $i < scalar @bytes; $i++) {
@@ -39,10 +67,21 @@ sub convertStream {
         $index++;
         if($index > 25) {
             $index = 0;
-            print "<br>";
+            print "\n";
         }
     }
-    print "<br>0x0};\n";
+    print "\n0x0};\n";
 }
-convertStream($input);
+
+
+
+print "<textarea cols=\"80\" rows=\"40\">";
+
+if($mode_str eq "array") {
+     convertStream($input);
+} else {
+    convertString($input);
+}
+
+print "</textarea>\n";
 print "</body></html>\n";
