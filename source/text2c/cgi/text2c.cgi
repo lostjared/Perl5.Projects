@@ -37,7 +37,12 @@ sub fix_string {
     my @bytes = split("", $input);
     my $output = "";
     for(my $i = 0; $i < scalar @bytes; $i++) {
-        if ($bytes[$i] eq "\\") {
+        if($bytes[$i] eq "\r") {
+            
+        }elsif($bytes[$i] eq "\n") {
+            $output .= "\\n";
+        }
+        elsif ($bytes[$i] eq "\\") {
             $output .= "\\\\";
         }
         elsif($bytes[$i] eq "\"") {
@@ -65,7 +70,7 @@ sub convertStream {
     for(my $i = 0; $i < scalar @bytes; $i++) {
         printf("0x%x,", ord($bytes[$i]));
         $index++;
-        if($index > 25) {
+        if($index > 10) {
             $index = 0;
             print "\n";
         }
