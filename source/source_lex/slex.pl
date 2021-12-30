@@ -30,6 +30,8 @@ sub init_map {
     $num{ord(' ')}  = SPACE;
     $num{ord('\t')} = SPACE;
     $num{ord('\r')} = SPACE;
+    $num{ord('"')} = STRING;
+    $num{ord("\'")} = SQ_STRING;
     return %num;
 }
 
@@ -70,6 +72,67 @@ sub get_digit {
     return $token;
 }
 
+sub get_string {
+    my $input = $_[0];
+    my $token;
+    $pos++;
+    my $ch = substr($input, $pos, 1);
+    my $n = $ch_map{ord($ch)};
+    
+    while($n != STRING) {
+        $token .= $ch;
+        $pos++;
+        if($pos > length($input)) {
+            last;
+        }
+        $ch = substr($input, $pos, 1);
+        $n = $ch_map{ord($ch)};
+        if($ch eq "\\") {
+            $pos++;
+            if($pos+1 < length($input)) {
+                $ch = substr($input, $pos, 1);
+                $token .= "\\" . $ch;
+                $pos++;
+                $ch = substr($input, $pos, 1);
+                $n = $ch_map{ord($ch)};
+            }
+        }
+    }
+    $pos++;
+    return $token;
+}
+
+sub get_sq_string {
+    my $input = $_[0];
+    my $token;
+    $pos++;
+    my $ch = substr($input, $pos, 1);
+    my $n = $ch_map{ord($ch)};
+    
+    while($n != SQ_STRING) {
+        $token .= $ch;
+        $pos++;
+        if($pos > length($input)) {
+            last;
+        }
+        $ch = substr($input, $pos, 1);
+        $n = $ch_map{ord($ch)};
+        if($ch eq "\\") {
+            $pos++;
+            if($pos+1 < length($input)) {
+                $ch = substr($input, $pos, 1);
+                $token .= "\\" . $ch;
+                $pos++;
+                $ch = substr($input, $pos, 1);
+                $n = $ch_map{ord($ch)};
+            }
+        }
+    }
+    $pos++;
+    return $token;
+}
+
+
 my $token_type = CHAR;
 
 sub type_strings {
@@ -80,6 +143,10 @@ sub type_strings {
     if($tok == DIGIT) {
         return "Digits";
     }
+    if($tok == STRING || $tok == SQ_STRING) {
+        return "String";
+    }
+    
     return "Unknown";
 }
 
@@ -87,12 +154,17 @@ sub type_strings {
 sub get_token {
     my $input = $_[0];
     my $ch = substr($input, $pos, 1);
+ #   print ":" . $ch . "\n";
     my $n = $ch_map{ord($ch)};
     $token_type = $n;
     if($n == CHAR) {
         return get_char($input);
     } elsif($n == DIGIT) {
         return get_digit($input);
+    } elsif($n == STRING) {
+        return get_string($input);
+    } elsif($n == SQ_STRING) {
+        return get_sq_string($input);
     } elsif($n == SPACE) {
         $pos++;
         return get_token($input);
@@ -103,6 +175,7 @@ sub proc_line {
     my $ofile = $_[0];
     my $data = $_[1];
     my $line = $_[2];
+    $pos = 0;
     while(my $token = get_token($data)) {
         my $ts = type_strings($token_type);
         print $ofile "<tr><th>$line</th><th>$token</th><th>$ts</th></tr>\n";
