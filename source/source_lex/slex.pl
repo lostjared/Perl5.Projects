@@ -87,26 +87,28 @@ sub get_token {
 sub proc_line {
     my $ofile = $_[0];
     my $data = $_[1];
+    my $line = $_[2];
     while(my $token = get_token($data)) {
-        print $token . "\n";
+        print $line . ":\t" . $token . "\n";
     }
 }
 
 sub proc_file {
     my $input_file = $_[0];
+    my $line = 1;
     print "slex: proccessing file: " . $input_file . "\n";
     open(INFILE, "<", $input_file) || die("could not open file: " . $!);
     open(OUTFILE, ">", $input_file . ".html") || die("could not open file: outputfile.html");
     print OUTFILE "<!doctype html>\n<html><head><title>$input_file</title></head><body>";
     while(<INFILE>) {
         chomp;
-        proc_line(OUTFILE, $_);
+        proc_line(OUTFILE, $_, $line);
+        $line++;
     }
     print OUTFILE "</body></html>";
     close(INFILE);
     close(OUTFILE);
 }
-
 while (my $input = shift @ARGV) {
     proc_file($input);
 }
