@@ -70,10 +70,25 @@ sub get_digit {
     return $token;
 }
 
+my $token_type = CHAR;
+
+sub type_strings {
+    my $tok = $_[0];
+    if($tok == CHAR) {
+        return "ID";
+    }
+    if($tok == DIGIT) {
+        return "Digits";
+    }
+    return "Unknown";
+}
+
+
 sub get_token {
     my $input = $_[0];
     my $ch = substr($input, $pos, 1);
     my $n = $ch_map{ord($ch)};
+    $token_type = $n;
     if($n == CHAR) {
         return get_char($input);
     } elsif($n == DIGIT) {
@@ -89,6 +104,8 @@ sub proc_line {
     my $data = $_[1];
     my $line = $_[2];
     while(my $token = get_token($data)) {
+        my $ts = type_strings($token_type);
+        print $ofile "<tr><th>$line</th><th>$token</th><th>$ts</th></tr>\n";
         print $line . ":\t" . $token . "\n";
     }
 }
@@ -100,12 +117,13 @@ sub proc_file {
     open(INFILE, "<", $input_file) || die("could not open file: " . $!);
     open(OUTFILE, ">", $input_file . ".html") || die("could not open file: outputfile.html");
     print OUTFILE "<!doctype html>\n<html><head><title>$input_file</title></head><body>";
+    print OUTFILE "<table border=\"1\" padding=\"5\"><tr><th>Line</th><th>Token</th><th>Type</th></tr>";
     while(<INFILE>) {
         chomp;
         proc_line(OUTFILE, $_, $line);
         $line++;
     }
-    print OUTFILE "</body></html>";
+    print OUTFILE "</table></body></html>";
     close(INFILE);
     close(OUTFILE);
 }
