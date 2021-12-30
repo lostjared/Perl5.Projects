@@ -27,11 +27,19 @@ sub init_map {
         $num{$i} = DIGIT;
     }
     
+    $num{ord('_')} = CHAR;
     $num{ord(' ')}  = SPACE;
     $num{ord('\t')} = SPACE;
     $num{ord('\r')} = SPACE;
     $num{ord('"')} = STRING;
     $num{ord("\'")} = SQ_STRING;
+    
+    my $symbols = "!@#$%^&*()-[]|\/<>.,?+--=:;";
+    for(my $i = 0; $i < length($symbols); $i++) {
+        my $ch = substr($symbols, $i, 1);
+        $num{ord($ch)} = SYMBOL;
+    }
+    
     return %num;
 }
 
@@ -132,6 +140,22 @@ sub get_sq_string {
     return $token;
 }
 
+sub get_symbol {
+    my $input = $_[0];
+    my $ch = substr($input, $pos, 1);
+    my $n = $ch_map{ord($ch)};
+    $pos++;
+    if($pos < length($input)) {
+        my $nch = substr($input, $pos, 1);
+        my $nn = $ch_map{ord($nch)};
+        if($nn == SYMBOL && $nch eq $ch) {
+            $pos++;
+            return $ch . $nch;
+        }
+        
+    }
+    return $ch;
+}
 
 my $token_type = CHAR;
 
@@ -146,7 +170,9 @@ sub type_strings {
     if($tok == STRING || $tok == SQ_STRING) {
         return "String";
     }
-    
+    if($tok == SYMBOL) {
+        return "Sybmol";
+    }
     return "Unknown";
 }
 
@@ -165,6 +191,8 @@ sub get_token {
         return get_string($input);
     } elsif($n == SQ_STRING) {
         return get_sq_string($input);
+    } elsif($n == SYMBOL) {
+        return get_symbol($input);
     } elsif($n == SPACE) {
         $pos++;
         return get_token($input);
