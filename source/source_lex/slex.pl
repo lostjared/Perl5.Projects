@@ -29,12 +29,12 @@ sub init_map {
     
     $num{ord('_')} = CHAR;
     $num{ord(' ')}  = SPACE;
-    $num{ord('\t')} = SPACE;
-    $num{ord('\r')} = SPACE;
+    $num{ord("\t")} = SPACE;
+    $num{ord("\r")} = SPACE;
     $num{ord('"')} = STRING;
     $num{ord("\'")} = SQ_STRING;
     
-    my $symbols = "!@#$%^&*()-[]|\/<>.,?+--=:;";
+    my $symbols = "!@#$%^&*()-[]|\/<>.,?+--=:;{}";
     for(my $i = 0; $i < length($symbols); $i++) {
         my $ch = substr($symbols, $i, 1);
         $num{ord($ch)} = SYMBOL;
@@ -171,7 +171,7 @@ sub type_strings {
         return "String";
     }
     if($tok == SYMBOL) {
-        return "Sybmol";
+        return "Symbol";
     }
     return "Unknown";
 }
@@ -180,7 +180,6 @@ sub type_strings {
 sub get_token {
     my $input = $_[0];
     my $ch = substr($input, $pos, 1);
- #   print ":" . $ch . "\n";
     my $n = $ch_map{ord($ch)};
     $token_type = $n;
     if($n == CHAR) {
@@ -194,7 +193,19 @@ sub get_token {
     } elsif($n == SYMBOL) {
         return get_symbol($input);
     } elsif($n == SPACE) {
-        $pos++;
+         while(1) {
+            if($pos < length($input)) {
+                my $c = substr($input, $pos, 1);
+                my $nn = $ch_map{ord($c)};
+                if ($nn != SPACE) {
+                    last;
+                } else {
+                    $pos++;
+                }
+            } else {
+                last;
+            }
+        }
         return get_token($input);
     }
 }
@@ -207,7 +218,7 @@ sub proc_line {
     while(my $token = get_token($data)) {
         my $ts = type_strings($token_type);
         print $ofile "<tr><th>$line</th><th>$token</th><th>$ts</th></tr>\n";
-        print $line . ":\t" . $token . "\n";
+        print $line . ":\t" . $token . "\t-> $ts\n";
     }
 }
 

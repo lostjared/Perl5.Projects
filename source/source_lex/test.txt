@@ -1,1 +1,5 @@
-apples bannas 123 4 5 test123 abc
+function main(x, y) {
+	return x + y;
+}
+
+
