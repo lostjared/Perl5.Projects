@@ -9,6 +9,7 @@ use constant {
     SYMBOL => 3,
     STRING => 4,
     SQ_STRING => 5,
+    SPACE => 6,
 };
 
 sub init_map {
@@ -25,6 +26,10 @@ sub init_map {
     for(my $i = ord('0'); $i <= ord('9'); $i++) {
         $num{$i} = DIGIT;
     }
+    
+    $num{ord(' ')}  = SPACE;
+    $num{ord('\t')} = SPACE;
+    $num{ord('\r')} = SPACE;
     return %num;
 }
 
@@ -73,15 +78,11 @@ sub get_token {
         return get_char($input);
     } elsif($n == DIGIT) {
         return get_digit($input);
-    } else {
-        if($ch eq ' ' || $ch eq '\t' || $ch eq '\r'){
-            $pos++;
-            return get_token($input);
-        }
+    } elsif($n == SPACE) {
+        $pos++;
+        return get_token($input);
     }
 }
-
-
 
 sub proc_line {
     my $ofile = $_[0];
@@ -90,7 +91,6 @@ sub proc_line {
         print $token . "\n";
     }
 }
-
 
 sub proc_file {
     my $input_file = $_[0];
@@ -106,7 +106,6 @@ sub proc_file {
     close(INFILE);
     close(OUTFILE);
 }
-
 
 while (my $input = shift @ARGV) {
     proc_file($input);
