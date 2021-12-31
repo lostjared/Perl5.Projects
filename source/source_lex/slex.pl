@@ -214,7 +214,7 @@ sub get_token {
         }
         return get_token($input);
     } elsif($n == C_NULL) {
-        print "[" . ord($ch) . "] -> Invalid character..\n";
+        print "[" . ord($ch) . "/" . $ch . "] -> Invalid character..\n";
         $pos++;
         return get_token($input);
     }
