@@ -4,6 +4,8 @@ use v5.14;
 use feature qw( switch );
 no warnings qw( experimental::smartmatch );
 
+package slex;
+
 use constant {
     C_NULL => 0,
     CHAR => 1,
@@ -22,17 +24,13 @@ sub fix_string {
         given($ch) {
             when(" ") {
                 $token .= "&nbsp;";
-            }
-            when("\t") {
+            } when("\t") {
                 $token .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-            when("<") {
+            } when("<") {
                 $token .= "&lt;";
-            }
-            when(">") {
+            } when(">") {
                 $token .= "&gt;";
-            }
-            default {
+            } default {
                 $token .= $ch;
             }
         }
@@ -192,17 +190,13 @@ sub type_strings {
     given($tok) {
         when(CHAR) {
             return "ID";
-        }
-        when(DIGIT) {
+        } when(DIGIT) {
             return "Digits";
-        }
-        when(STRING) {
+        } when(STRING) {
             return "String";
-        }
-        when(SQ_STRING) {
+        } when(SQ_STRING) {
             return "String";
-        }
-        when(SYMBOL) {
+        } when(SYMBOL) {
             return "Symbol";
         }
     }
@@ -221,20 +215,15 @@ sub get_token {
     given($n) {
         when(CHAR) {
             return get_char($input);
-        }
-        when(DIGIT) {
+        } when(DIGIT) {
             return get_digit($input);
-        }
-        when(STRING) {
+        } when(STRING) {
             return get_string($input);
-        }
-        when(SQ_STRING) {
+        } when(SQ_STRING) {
             return get_sq_string($input);
-        }
-        when(SYMBOL) {
+        } when(SYMBOL) {
             return get_symbol($input);
-        }
-        when(SPACE) {
+        } when(SPACE) {
             while(1) {
                 if($pos < length($input)) {
                     my $c = substr($input, $pos, 1);
@@ -266,7 +255,9 @@ sub proc_line {
     while(length($token = get_token($data)) > 0) {
         my $ts = type_strings($token_type);
         print $ofile "<tr><th>$line</th><th>" . fix_string($token) . "</th><th>$ts</th></tr>\n";
-        print $line . ":\t" . $token . "\t-> $ts\n";
+        if(scalar @ARGV > 0) {
+            print $line . ":\t" . $token . "\t-> $ts\n";
+        }
     }
 }
 
@@ -287,6 +278,24 @@ sub proc_file {
     close(INFILE);
     close(OUTFILE);
 }
+
+sub proc_stdout {
+    my $line = 1;
+    print "<!doctype html>\n<html><head><title>SLEX output</title></head><body>";
+    print "<table border=\"1\" padding=\"5\"><tr><th>Line</th><th>Token</th><th>Type</th></tr>";
+    while(<STDIN>) {
+        chomp;
+        proc_line(*STDOUT, $_, $line);
+        $line++;
+    }
+    print "</table></body></html>";
+}
+
+if(scalar(@ARGV) == 0) {
+    proc_stdout();
+    exit(0);
+}
+
 while (my $input = shift @ARGV) {
     proc_file($input);
 }
