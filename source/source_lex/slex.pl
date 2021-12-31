@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 
-use warnings;
+use v5.14;
+use feature qw( switch );
+no warnings qw( experimental::smartmatch );
 
 use constant {
     C_NULL => 0,
@@ -17,16 +19,22 @@ sub fix_string {
     my $token;
     for(my $i = 0; $i < length($input); $i++) {
         my $ch = substr($input, $i , 1);
-        if($ch eq " ") {
-            $token .= "&nbsp;";
-        } elsif($ch eq "\t") {
-            $token .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        } elsif($ch eq "<") {
-            $token .= "&lt;";
-        } elsif($ch eq ">") {
-            $token .= "&gt;";
-        } else {
-            $token .= $ch;
+        given($ch) {
+            when(" ") {
+                $token .= "&nbsp;";
+            }
+            when("\t") {
+                $token .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+            when("<") {
+                $token .= "&lt;";
+            }
+            when(">") {
+                $token .= "&gt;";
+            }
+            default {
+                $token .= $ch;
+            }
         }
     }
     return $token;
@@ -181,63 +189,71 @@ my $token_type = CHAR;
 
 sub type_strings {
     my $tok = $_[0];
-    if($tok == CHAR) {
-        return "ID";
-    }
-    if($tok == DIGIT) {
-        return "Digits";
-    }
-    if($tok == STRING || $tok == SQ_STRING) {
-        return "String";
-    }
-    if($tok == SYMBOL) {
-        return "Symbol";
+    given($tok) {
+        when(CHAR) {
+            return "ID";
+        }
+        when(DIGIT) {
+            return "Digits";
+        }
+        when(STRING) {
+            return "String";
+        }
+        when(SQ_STRING) {
+            return "String";
+        }
+        when(SYMBOL) {
+            return "Symbol";
+        }
     }
     return "Unknown";
 }
 
 
 sub get_token {
-    
     my $input = $_[0];
-    
     if($pos+1 > length($input)) {
         return "";
     }
-    
     my $ch = substr($input, $pos, 1);
     my $n = $ch_map{ord($ch)};
-    
     $token_type = $n;
-    if($n == CHAR) {
-        return get_char($input);
-    } elsif($n == DIGIT) {
-        return get_digit($input);
-    } elsif($n == STRING) {
-        return get_string($input);
-    } elsif($n == SQ_STRING) {
-        return get_sq_string($input);
-    } elsif($n == SYMBOL) {
-        return get_symbol($input);
-    } elsif($n == SPACE) {
-         while(1) {
-            if($pos < length($input)) {
-                my $c = substr($input, $pos, 1);
-                my $nn = $ch_map{ord($c)};
-                if ($nn != SPACE) {
-                    last;
-                } else {
-                    $pos++;
-                }
-            } else {
-                last;
-            }
+    given($n) {
+        when(CHAR) {
+            return get_char($input);
         }
-        return get_token($input);
-    } elsif($n == C_NULL) {
-        print "[" . ord($ch) . "/" . $ch . "] -> Invalid character..\n";
-        $pos++;
-        return get_token($input);
+        when(DIGIT) {
+            return get_digit($input);
+        }
+        when(STRING) {
+            return get_string($input);
+        }
+        when(SQ_STRING) {
+            return get_sq_string($input);
+        }
+        when(SYMBOL) {
+            return get_symbol($input);
+        }
+        when(SPACE) {
+            while(1) {
+                if($pos < length($input)) {
+                    my $c = substr($input, $pos, 1);
+                    my $nn = $ch_map{ord($c)};
+                    if ($nn != SPACE) {
+                        last;
+                    } else {
+                        $pos++;
+                    }
+                } else {
+                    last;
+                }
+            }
+            return get_token($input);
+        } when(C_NULL) {
+            print "[" . ord($ch) . "/" . $ch . "] -> Invalid character..\n";
+            $pos++;
+            return get_token($input);
+        }
     }
 }
 
@@ -264,7 +280,7 @@ sub proc_file {
     print OUTFILE "<table border=\"1\" padding=\"5\"><tr><th>Line</th><th>Token</th><th>Type</th></tr>";
     while(<INFILE>) {
         chomp;
-        proc_line(OUTFILE, $_, $line);
+        proc_line(*OUTFILE, $_, $line);
         $line++;
     }
     print OUTFILE "</table></body></html>";
