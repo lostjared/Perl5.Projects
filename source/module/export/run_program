@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export PERL5LIB=`pwd`
+perl test.pl
