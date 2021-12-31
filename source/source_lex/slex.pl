@@ -264,28 +264,28 @@ sub proc_file {
     print "slex: proccessing file: " . $input_file . "\n";
     open(INFILE, "<", $input_file) || die("could not open file: " . $!);
     open(OUTFILE, ">", $input_file . ".html") || die("could not open file: outputfile.html");
-    print OUTFILE "<!doctype html>\n<html><head><title>$input_file</title></head><body>";
-    print OUTFILE "<table border=\"1\" padding=\"5\"><tr><th>Line</th><th>Token</th><th>Type</th></tr>";
+    print OUTFILE "<!doctype html>\n<html>\n<head><title>$input_file</title></head>\n<body>\n";
+    print OUTFILE "<table border=\"1\" padding=\"5\"><tr><th>Line</th><th>Token</th><th>Type</th></tr>\n";
     while(<INFILE>) {
         chomp;
         proc_line(*OUTFILE, $_, $line);
         $line++;
     }
-    print OUTFILE "</table></body></html>";
+    print OUTFILE "</table>\n</body>\n</html>";
     close(INFILE);
     close(OUTFILE);
 }
 
 sub proc_stdout {
     my $line = 1;
-    print "<!doctype html>\n<html><head><title>SLEX output</title></head><body>";
-    print "<table border=\"1\" padding=\"5\"><tr><th>Line</th><th>Token</th><th>Type</th></tr>";
+    print "<!doctype html>\n<html><head><title>SLEX output</title></head>\n<body>";
+    print "<table border=\"1\" padding=\"5\"><tr><th>Line</th><th>Token</th><th>Type</th></tr>\n";
     while(<STDIN>) {
         chomp;
         proc_line(*STDOUT, $_, $line);
         $line++;
     }
-    print "</table></body></html>";
+    print "</table>\n</body>\n</html>\n";
 }
 
 if(scalar(@ARGV) == 0) {
