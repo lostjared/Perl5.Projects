@@ -34,7 +34,7 @@ sub init_map {
     $num{ord('"')} = STRING;
     $num{ord("\'")} = SQ_STRING;
     
-    my $symbols = "!@#$%^&*()-[]|/<>.,?+--=:;{}";
+    my $symbols = "`!@#$%^&*()-[]|/<>.,?+--=:;{}";
     for(my $i = 0; $i < length($symbols); $i++) {
         my $ch = substr($symbols, $i, 1);
         $num{ord($ch)} = SYMBOL;
