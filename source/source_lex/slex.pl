@@ -34,7 +34,7 @@ sub init_map {
     $num{ord('"')} = STRING;
     $num{ord("\'")} = SQ_STRING;
     
-    my $symbols = "!@#$%^&*()-[]|\/<>.,?+--=:;{}";
+    my $symbols = "!@#$%^&*()-[]|/<>.,?+--=:;{}";
     for(my $i = 0; $i < length($symbols); $i++) {
         my $ch = substr($symbols, $i, 1);
         $num{ord($ch)} = SYMBOL;
@@ -178,7 +178,13 @@ sub type_strings {
 
 
 sub get_token {
+    
     my $input = $_[0];
+    
+    if($pos+1 > length($input)) {
+        return;
+    }
+    
     my $ch = substr($input, $pos, 1);
     my $n = $ch_map{ord($ch)};
     $token_type = $n;
@@ -206,6 +212,10 @@ sub get_token {
                 last;
             }
         }
+        return get_token($input);
+    } elsif($n == C_NULL) {
+        print "[" . ord($ch) . "] -> Invalid character..\n";
+        $pos++;
         return get_token($input);
     }
 }

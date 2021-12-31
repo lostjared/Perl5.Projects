@@ -1,5 +1,10 @@
+
+function square(x) {
+	return x*x;
+}
+
 function main(x, y) {
-	return x + y;
+	return square(x) + square(y);
 }
 
 
