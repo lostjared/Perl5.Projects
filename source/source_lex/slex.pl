@@ -255,9 +255,6 @@ sub proc_line {
     while(length($token = get_token($data)) > 0) {
         my $ts = type_strings($token_type);
         print $ofile "<tr><th>$line</th><th>" . fix_string($token) . "</th><th>$ts</th></tr>\n";
-        if(scalar @ARGV > 0) {
-            print $line . ":\t" . $token . "\t-> $ts\n";
-        }
     }
 }
 
