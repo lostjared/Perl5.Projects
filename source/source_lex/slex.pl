@@ -12,6 +12,26 @@ use constant {
     SPACE => 6,
 };
 
+sub fix_string {
+    my $input = $_[0];
+    my $token;
+    for(my $i = 0; $i < length($input); $i++) {
+        my $ch = substr($input, $i , 1);
+        if($ch eq " ") {
+            $token .= "&nbsp;";
+        } elsif($ch eq "\t") {
+            $token .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        } elsif($ch eq "<") {
+            $token .= "&lt;";
+        } elsif($ch eq ">") {
+            $token .= "&gt;";
+        } else {
+            $token .= $ch;
+        }
+    }
+    return $token;
+}
+
 sub init_map {
     my %num = ();
     for(my $i = 0; $i < 255; $i++) {
@@ -33,7 +53,6 @@ sub init_map {
     $num{ord("\r")} = SPACE;
     $num{ord('"')} = STRING;
     $num{ord("\'")} = SQ_STRING;
-    
     my $symbols = "`!@#$%^&*()-[]|/<>.,?+--=:;{}";
     for(my $i = 0; $i < length($symbols); $i++) {
         my $ch = substr($symbols, $i, 1);
@@ -68,7 +87,8 @@ sub get_digit {
     my $token;
     my $ch = substr($input, $pos, 1);
     my $n = $ch_map{ord($ch)};
-    while($n == DIGIT) {
+    
+    while($n == DIGIT || $ch eq "0") {
         $token .= $ch;
         $pos++;
         if($pos > length($input)) {
@@ -182,11 +202,12 @@ sub get_token {
     my $input = $_[0];
     
     if($pos+1 > length($input)) {
-        return;
+        return "";
     }
     
     my $ch = substr($input, $pos, 1);
     my $n = $ch_map{ord($ch)};
+    
     $token_type = $n;
     if($n == CHAR) {
         return get_char($input);
@@ -225,9 +246,10 @@ sub proc_line {
     my $data = $_[1];
     my $line = $_[2];
     $pos = 0;
-    while(my $token = get_token($data)) {
+    my $token;
+    while(length($token = get_token($data)) > 0) {
         my $ts = type_strings($token_type);
-        print $ofile "<tr><th>$line</th><th>$token</th><th>$ts</th></tr>\n";
+        print $ofile "<tr><th>$line</th><th>" . fix_string($token) . "</th><th>$ts</th></tr>\n";
         print $line . ":\t" . $token . "\t-> $ts\n";
     }
 }

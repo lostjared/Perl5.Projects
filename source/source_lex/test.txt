@@ -4,6 +4,10 @@ function square(x) {
 }
 
 function main(x, y) {
+	x = 0;
+	if(x > 25 && y < 15) {
+		print("Hello, World\n");
+	}
 	return square(x) + square(y);
 }
 
