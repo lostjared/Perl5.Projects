@@ -1,5 +1,5 @@
 #!/usr/bin/perl
 
-require 'header.pl'
+require './header.pl'
 
 &hello();
