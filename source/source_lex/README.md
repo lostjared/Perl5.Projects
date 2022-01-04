@@ -1,15 +1,11 @@
 
 Run
 
-$ perl -I `pwd` test-cmd.pl file.script
+$ perl -I . test-cmd.pl file.script
 
 or
 
-export PERL5LIB=`pwd`
-
-or
-
-export PERL5LIb=/path/to/this/dir
+export PERL5LIB=/path/to/this/dir
 
 
 
