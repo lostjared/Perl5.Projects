@@ -6,8 +6,6 @@ sub trim {
     return $s;
 }
 
-my $total_blank = 0;
-my $total_index = 0;
 
 sub count_file {
     my $input = $_[0];
@@ -23,12 +21,20 @@ sub count_file {
     }
     close (INPUT);
     print "File: " . $input . " blanks: " . $blank . " lines: " . $index . " total lines: " . ($blank+$index) . "\n";
-    $total_blank += $blank;
-    $total_index += $index;
+    my @array = ($blank, $index, $blank+$index);
+    return @array;
+
 }
+
+my $total_blank = 0;
+my $total_index = 0;
+my $total_lines = 0;
 
 while (my $f = shift @ARGV) {
-    &count_file($f);
+    my @rt = &count_file($f);
+    $total_blank += $rt[0];
+    $total_index += $rt[1];
+    $total_lines += $rt[2];
 }
 
-print "total lines: " .  ($total_index+$total_blank) . "\n";
+print "total lines: " .  ($total_index+$total_blank) . " total blanks: " . $total_blank . " lines: " . $total_index . "\n";
