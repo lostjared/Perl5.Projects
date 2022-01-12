@@ -1,5 +1,14 @@
 #!/usr/bin/perl
 
+# will sort images outputed by acidcamGL
+# print out a list to stdout to use with img2mov
+# use
+# ./sort_images.pl directory -2021
+# or
+# ./sort_images.pl directory -2020
+
+
+
 my $dir = shift @ARGV;
 my $src = shift @ARGV;
 opendir $d, $dir or die("Could not open directory");
