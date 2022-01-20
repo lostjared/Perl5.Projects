@@ -3,10 +3,9 @@
 # will sort images outputed by acidcamGL
 # print out a list to stdout to use with img2mov
 # use
-# ./sort_images.pl directory -2021
+# ./sort_images.pl directory
 # or
-# ./sort_images.pl directory -2020
-
+# ./sort_images.pl directory
 
 
 my $dir = shift @ARGV;
