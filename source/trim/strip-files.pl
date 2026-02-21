@@ -31,6 +31,12 @@ sub process_file {
         $content =~ s/\/\*.*?\*\///sg;
         $content =~ s/\/\/.*//g;
 
+        # Remove lines that are now empty (were comment-only lines)
+        $content =~ s/^\s*\n//mg;
+
+        # Collapse aligned '=' signs: multiple spaces before = become a single space
+        $content =~ s/(\S) {2,}(=)/$1 $2/g;
+
         # Write the cleaned content back to the file
         open(my $out, '>', $_) or die "Could not write to file $_: $!";
         print $out $content;
